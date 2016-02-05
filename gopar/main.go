@@ -37,6 +37,39 @@ func validateRows(rows [][]string, colSize int) {
 	}
 }
 
+func timeit(f func()) time.Duration {
+	start := time.Now()
+	f()
+	return time.Now().Sub(start)
+}
+
+func validateParallel(rows [][]string, coreCount int) {
+	blockSize := len(rows) / coreCount
+
+	wg := sync.WaitGroup{}
+	wg.Add(coreCount)
+
+	// Given N is the number of cores on the machine, spin up the first N-1 go-
+	// routines to process the first (N-1) * len(rows) / N blocks of rows. For
+	// example, if the machine has 4 cores, this for loop will spin up the first
+	// 3 to process the first 3/4 of the total rows.
+	for i := 0; i < coreCount-1; i++ {
+		rows := rows[i*blockSize : (i+1)*blockSize]
+		go func() {
+			validateRows(rows, len(rows[0]))
+			wg.Done()
+		}()
+	}
+
+	// Do the last block separately just in case integer division caused
+	// `blockSize * coreCount` to be less than `len(rows)`
+	go func() {
+		validateRows(rows[(coreCount-1)*blockSize:], len(rows[0]))
+		wg.Done()
+	}()
+	wg.Wait()
+}
+
 func main() {
 	rows, err := scanInCSV(os.Stdin)
 	if err != nil {
@@ -48,32 +81,15 @@ func main() {
 		os.Exit(-1)
 	}
 
-	colSize := len(rows[0])
 	coreCount := runtime.NumCPU()
-	fmt.Println("GOMAXPROCS:", coreCount)
 	runtime.GOMAXPROCS(coreCount)
-	blockSize := len(rows) / coreCount
+	fmt.Println("GOMAXPROCS:", coreCount)
 	fmt.Println("Beginning validation...")
-	start := time.Now()
 
-	wg := sync.WaitGroup{}
-	wg.Add(coreCount)
-	for i := 0; i < coreCount-1; i++ {
-		rows := rows[i*blockSize : (i+1)*blockSize]
-		go func() {
-			validateRows(rows, colSize)
-			wg.Done()
-		}()
-	}
-	// do the last block separately just in case integer division caused
-	// `blockSize * coreCount` to be less than `len(rows)`
-	go func() {
-		validateRows(rows[(coreCount-1)*blockSize:], colSize)
-		wg.Done()
-	}()
-	wg.Wait()
-
-	msg := "Validated %d rows of %d cells in %v\n"
-	dt := time.Now().Sub(start)
-	fmt.Printf(msg, len(rows), colSize, dt)
+	fmt.Printf(
+		"Validated %d rows of %d cells in %v\n",
+		len(rows),
+		len(rows[0]),
+		timeit(func() { validateParallel(rows, coreCount) }),
+	)
 }
