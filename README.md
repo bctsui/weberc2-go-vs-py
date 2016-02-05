@@ -15,15 +15,15 @@ generated for successive calls to the program (provided the arguments remain
 the same).
 
 ``` bash
-$ csvgen 1000 100000 | python3 py/main.py
+$ go run csvgen.go 1000 100000 | python3 sequential.py
 Beginning validation...
 Validated 100000 rows of 1000 cells in 30.714239s
 
-$ csvgen 1000 100000 | go run goseq/main.go
+$ go run csvgen.go 1000 100000 | go run sequential.go
 Beginning validation...
 Validated 100000 rows of 1000 cells in 6.805363362s
 
-$ csvgen 1000 100000 | go run gopar/main.go
+$ go run csvgen.go 1000 100000 | go run parallel.go
 GOMAXPROCS: 4
 Beginning validation...
 Validated 100000 rows of 1000 cells in 3.093580738s
