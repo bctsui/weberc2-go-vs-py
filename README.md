@@ -5,8 +5,8 @@ This repo contains tools for benchmarking string -> int conversion for large
 CSV files. There are 3 principle implementations: a Python3 implementation,
 a Go sequential implementation, and a Go parallelized implementation. All three
 implementations read from stdin into a 2D string list/slice (`[][]string`)
-before the timer is started (so as to eliminate noise from the filesystem) and
-the string -> int conversion commences.
+before the timer is started (so as to eliminate noise from inter-process
+communication) and the string -> int conversion commences.
 
 Included in the repository is the `csvgen` tool which generates CSV data. It
 takes 2 arguments, a column count and a row count, and it writes that data to
