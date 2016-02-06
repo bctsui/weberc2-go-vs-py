@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -20,7 +21,8 @@ func abortf(format string, v ...interface{}) {
 
 func main() {
 	if len(os.Args) < 3 {
-		abortf("USAGE: %s <col-count> <row-count>\n", os.Args[0])
+		filename := filepath.Base(os.Args[0])
+		abortf("USAGE: %s <col-count> <row-count>\n", filename)
 	}
 	columnCount, err := strconv.Atoi(os.Args[1])
 	if err != nil {

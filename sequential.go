@@ -29,7 +29,8 @@ func validateRows(rows [][]string, colSize int) {
 		}
 		for colID, cell := range row {
 			if _, err := strconv.Atoi(cell); err != nil {
-				fmt.Fprintf(os.Stderr, "Err at (%d, %d): %v\n", colID, rowID, err)
+				msg := "Err at (%d, %d): %v\n"
+				fmt.Fprintf(os.Stderr, msg, colID, rowID, err)
 			}
 		}
 	}

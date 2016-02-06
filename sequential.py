@@ -3,7 +3,7 @@ import sys
 
 def scan_in_csv(r):
     try:
-        return [line.split(',') for line in sys.stdin], None
+        return [line.split(',') for line in r], None
     except Exception as e:
         return None, e
 
