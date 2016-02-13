@@ -56,18 +56,10 @@ func validateParallel(rows [][]string, coreCount int) {
 	// divide `rows` into `coreCount` blocks of rows, and then dispatch a
 	// goroutine to process each block.
 	for _, block := range subslice(rows, coreCount) {
-		// Create a new variable exclusively for the goroutine that corresponds
-		// to this loop iteration. All goroutines can't share one variable,
-		// because the variable will be pointing to the last block returned by
-		// subslice() before the first goroutine is kicked off, meaning all
-		// goroutines would be operating on the last block and the previous
-		// blocks would be ignored.
-		block := block
-
-		go func() {
+		go func(block [][]string) {
 			validateRows(block, len(rows[0]))
 			wg.Done() // signal that this goroutine has finished execution
-		}()
+		}(block)
 	}
 
 	wg.Wait() // block until `wg.Done()` has been called `coreCount` times
