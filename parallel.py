@@ -13,6 +13,7 @@ def scan_in_csv(r):
         return None, e
 
 def validate_rows(rows, col_size):
+    print('id of forked rows', id(rows)) # see if there was a copy of `rows` passed in
     for row_id, row in enumerate(rows):
         if len(row) != col_size:
             msg = "Row {} has {} cells, but expected {}\n"
@@ -23,7 +24,7 @@ def validate_rows(rows, col_size):
                 int(cell)
             except ValueError as e:
                 print("Err at ({}, {}): {}".format(col_id, row_id, e))
-                
+
 def validate_parallel(rows, col_size, core_count):
     pool = multiprocessing.dummy.Pool(core_count)
     chunks = [rows[i::core_count] for i in range(core_count)]
@@ -48,6 +49,7 @@ if __name__ == '__main__':
 
     core_count = multiprocessing.cpu_count()
     print("Beginning validation...")
+    print('id of original rows', id(rows))
     print("Validated {} rows of {} cells in {}".format(
         len(rows),
         len(rows[0]),
