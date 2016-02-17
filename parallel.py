@@ -12,7 +12,7 @@ def scan_in_csv(r):
     except Exception as e:
         return None, e
 
-def validate_rows(row, col_size):
+def validate_rows(rows, col_size):
     for row_id, row in enumerate(rows):
         if len(row) != col_size:
             msg = "Row {} has {} cells, but expected {}\n"
