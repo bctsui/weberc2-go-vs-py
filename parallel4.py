@@ -29,7 +29,8 @@ def validate_parallel(rows, col_size, core_count):
 
     # Partition the input based on number of cores without allocating memory
     # for new lists, ie. just find the index boundaries of the global list.
-    # This is where golang's implementation of slices & arrays would shine.
+    #
+    # This is where golang's implementation of slices & arrays would shine...
     chunks = [] # pairs of (start, end)
     chunk_size = int(len(rows)/core_count)
     end = len(rows)
@@ -38,9 +39,7 @@ def validate_parallel(rows, col_size, core_count):
         chunks.append((start, end))
         end = start
 
-    #print('Chunk Size:', chunk_size)
-    #print('Chunks:', chunks)
-
+    # ... but perhaps it doesn't matter much since I have to fork `rows` to in its entirety.
     pool.map(lambda pairs: validate_rows(rows, col_size, pairs[0], pairs[1]), chunks)
     pool.close()
     pool.join()
